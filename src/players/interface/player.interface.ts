@@ -1,10 +1,10 @@
-export interface Player{
-    readonly _id: string ;
+import{Document} from 'mongoose'
+
+
+export interface Player extends Document{
     readonly phoneNumber :string
     readonly email:string
     name:string
-    reanking:string
+    ranking :string
     rankingPosition: number 
-   // playerPhotoUrl
-
 }
