@@ -1,25 +1,31 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { HttpException, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { CreatePlayersDtos } from "./Dtos/create-players.dto";
 import { v4 as uuidv4 } from "uuid";
+import { InjectModel } from "@nestjs/mongoose";
+import { Player } from "./interface/player.interface";
+import { Model } from "mongoose";
 
 @Injectable()
 export class PlayerService{
 
     private readonly logger = new Logger(PlayerService.name)
 
-    constructor(){}
+    constructor(@InjectModel('Player')
+        private readonly PlayerModel:Model<Player>
+    ){}
 
-    async CreatePlayers(CreatePlayersDtos: CreatePlayersDtos){
-        const {name,phone,email}  = CreatePlayersDtos
+    async CreatePlayers(CreatePlayersDtos: CreatePlayersDtos):Promise<Player>{
+         
+        try{
+            this.logger.log("Create a new player...")
 
-        this.logger.log("Create a new player...")
-        const player ={
-            _id : uuidv4(),
-            name,
-            phone,
-            email,
-            ranking :"C",
-            positionRanking: 1
+            const createdPlayer = new this.PlayerModel(CreatePlayersDtos)
+
+            this.logger.log(`create player ${JSON.stringify(createdPlayer)}`)
+            return await createdPlayer.save()
+         }catch(error){
+            this.logger.log("error save player")
+            throw new  InternalServerErrorException("internal  erro")
         }
     }
 }
