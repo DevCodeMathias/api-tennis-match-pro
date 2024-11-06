@@ -21,10 +21,23 @@ export class PlayerService{
 
             const createdPlayer = new this.PlayerModel(CreatePlayersDtos)
 
-            this.logger.log(`create player ${JSON.stringify(createdPlayer)}`)
+            this.logger.log(`creating player ${JSON.stringify(createdPlayer)}`)
             return await createdPlayer.save()
          }catch(error){
-            this.logger.log("error save player")
+            this.logger.error(error)
+            throw new  InternalServerErrorException("internal  erro")
+        }
+    }
+
+
+    async ReturnPlayers():Promise<Player[]>{
+        try{
+            const players = await this.PlayerModel.find().exec(); 
+            this.logger.log(`Found ${players.length} players`);
+            
+            return players;
+        }catch(err){
+            this.logger.error(err)
             throw new  InternalServerErrorException("internal  erro")
         }
     }
